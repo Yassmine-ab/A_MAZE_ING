@@ -20,17 +20,9 @@ install:
 				@pip install
 
 run:
-				@if [ ! -f config.txt ]; then \
-					echo "Error: config.txt not found"; \
-					exit 1; \
-				fi; \
 				@python3 a_maze_ing.py config.txt
 
 debug:
-				@if [ ! -f config.txt ]; then \
-					echo "Error: config.txt not found"; \
-					exit 1; \
-				fi; \
 				@python3 -m pdb a_maze_ing.py config.txt
 
 clean:

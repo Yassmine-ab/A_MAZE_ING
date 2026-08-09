@@ -59,9 +59,38 @@ class Maze:
                 neighbor_cell.walls["East"] = False
                 cell.walls[direction] = False
 
+    def restore_wall(self, cell: Cell, direction: str) -> None:
+        if direction not in cell.walls:
+            raise ValueError(f"Invalid direction: {direction}. Valid directions are 'North', 'East', 'South', 'West'.")
+        (x, y) = cell.position
+        if direction == "North":
+            if y - 1 < 0:
+                return
+            neighbor_cell = self.grid[y - 1][x]
+            neighbor_cell.walls["South"] = True
+            cell.walls[direction] = True
+        elif direction == "East":
+            if x + 1 >= self.width:
+                return
+            neighbor_cell = self.grid[y][x + 1]
+            neighbor_cell.walls["West"] = True
+            cell.walls[direction] = True
+        elif direction == "South":
+            if y + 1 >= self.height:
+                return
+            neighbor_cell = self.grid[y + 1][x]
+            neighbor_cell.walls["North"] = True
+            cell.walls[direction] = True
+        elif direction == "West":
+            if x - 1 < 0:
+                return
+            neighbor_cell = self.grid[y][x - 1]
+            neighbor_cell.walls["East"] = True
+            cell.walls[direction] = True
+
     def get_neighbors(self, cell: Cell) -> dict[str, Cell]:
         (x, y) = cell.position
-        neighbors: dict[str, Cell] = {}
+        neighbors = {}
         if y - 1 >= 0:
             neighbors["North"] = self.grid[y - 1][x]
         if x + 1 < self.width:
@@ -83,7 +112,7 @@ class Maze:
 
     def get_open_neighbors(self, cell: Cell) -> dict[str, Cell]:
         neighbors = self.get_neighbors(cell)
-        open_neighbors: dict[str, Cell] = {}
+        open_neighbors = {}
         for direction, neighbor in neighbors.items():
             if not cell.walls[direction]:
                 open_neighbors[direction] = neighbor
@@ -91,7 +120,7 @@ class Maze:
 
 
     def find_shortest_path(self, start: Cell, end: Cell) -> list[str]:
-        queue = deque([(start, [])])
+        queue: deque[tuple[Cell, list[str]]] = deque([(start, [])])
         visited = set()
         visited.add(start.position)
         while queue:
@@ -103,6 +132,37 @@ class Maze:
                     visited.add(neighbor.position)
                     queue.append((neighbor, path + [direction]))
         return []
+
+    def is_open_area_3x3(self, x: int, y: int) -> bool:
+        for dy in range(3):
+            for dx in range(2):
+                neighbor_cell = self.grid[y + dy][x + dx]
+                if neighbor_cell.walls["East"]:
+                    return False
+        for dx in range(3):
+            for dy in range(2):
+                neighbor_cell = self.grid[y + dy][x + dx]
+                if neighbor_cell.walls["South"]:
+                    return False
+        return True
+
+    def get_affected_areas_3x3(self, x: int, y: int, direction: str) -> list[tuple[int, int]]:
+        if direction == "East":
+            affected_areas = [(x - 1, y), (x, y), (x - 1, y - 2), (x, y - 2), (x - 1, y - 1), (x, y - 1)]
+        elif direction == "South":
+            affected_areas = [(x, y - 1), (x, y), (x - 2, y - 1), (x - 2, y), (x - 1, y - 1), (x - 1, y)]
+        elif direction == "West":
+            affected_areas = [(x + 1, y), (x, y), (x + 1, y - 2), (x, y - 2), (x + 1, y - 1), (x, y - 1)]
+        elif direction == "North":
+            affected_areas = [(x, y + 1), (x, y), (x - 2, y + 1), (x - 2, y), (x - 1, y + 1), (x - 1, y)]
+        else:
+            raise ValueError(f"Invalid direction: {direction}. Valid directions are 'North', 'East', 'South', 'West'.")
+        filtered_areas = []
+        for cx, cy in affected_areas:    
+            if cx >= 0 and cx + 2 < self.width and cy >= 0 and cy + 2 < self.height:
+                filtered_areas.append((cx, cy))
+        return filtered_areas
+
 
 def main() -> None:
     m = Maze(5, 5)
