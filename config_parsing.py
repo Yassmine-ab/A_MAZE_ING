@@ -1,19 +1,6 @@
 #!/usr/bin/env python3
 
 
-def parse_config(file_path: str) -> dict[str, str]:
-    config: dict[str, str] = {}
-    with open(file_path, "r") as file:
-        for line in file:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                key, value = line.split("=", 1)
-                config[key.strip()] = value.strip()
-    if config == {}:
-        raise ValueError("Configuration file is empty or contains no valid entries.")
-    return config
-
-
 class MazeConfig:
     def __init__(self, width: int, height: int, entry: tuple[int, int],
                  exit_pos: tuple[int, int], output_file: str, perfect: bool):

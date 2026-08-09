@@ -3,6 +3,7 @@
 
 from typing import Optional
 from random import shuffle
+from collections import deque
 
 
 class Cell:
@@ -80,11 +81,34 @@ class Maze:
                 self.break_wall(current_cell, direction)
                 self.generate_maze(neighbor)
 
+    def get_open_neighbors(self, cell: Cell) -> dict[str, Cell]:
+        neighbors = self.get_neighbors(cell)
+        open_neighbors: dict[str, Cell] = {}
+        for direction, neighbor in neighbors.items():
+            if not cell.walls[direction]:
+                open_neighbors[direction] = neighbor
+        return open_neighbors
+
+
+    def find_shortest_path(self, start: Cell, end: Cell) -> list[str]:
+        queue = deque([(start, [])])
+        visited = set()
+        visited.add(start.position)
+        while queue:
+            current_cell, path = queue.popleft()
+            if current_cell == end:
+                return path
+            for direction, neighbor in self.get_open_neighbors(current_cell).items():
+                if neighbor.position not in visited:
+                    visited.add(neighbor.position)
+                    queue.append((neighbor, path + [direction]))
+        return []
 
 def main() -> None:
     m = Maze(5, 5)
     m.generate_maze(m.grid[0][0])
-
+    path = m.find_shortest_path(m.grid[0][0], m.grid[4][4])
+    print(path)
 
 if __name__ == "__main__":
     main()
