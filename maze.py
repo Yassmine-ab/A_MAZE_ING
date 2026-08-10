@@ -88,6 +88,15 @@ class Maze:
             neighbor_cell.walls["East"] = True
             cell.walls[direction] = True
 
+    def try_break_wall_safely(self, cell: Cell, direction: str) -> bool:
+        x, y = cell.position
+        self.break_wall(cell, direction)
+        for cx, cy in self.get_affected_areas_3x3(x, y, direction):
+            if self.is_open_area_3x3(cx, cy):
+                self.restore_wall(cell, direction)
+                return False
+        return True
+
     def get_neighbors(self, cell: Cell) -> dict[str, Cell]:
         (x, y) = cell.position
         neighbors = {}
@@ -163,10 +172,31 @@ class Maze:
                 filtered_areas.append((cx, cy))
         return filtered_areas
 
+    def get_all_closed_walls(self) -> list[tuple[Cell, str]]:
+        closed_walls = []
+        for y in range(self.height):
+            for x in range(self.width):
+                cell = self.grid[y][x]
+                for direction, is_closed in cell.walls.items():
+                    if (direction == "East" or direction == "South") and is_closed:
+                        closed_walls.append((cell, direction))
+        return closed_walls
+
+    def add_loops(self, ratio: float = 0.15) -> None:
+        closed_walls = self.get_all_closed_walls()
+        shuffle(closed_walls)
+        target = int(len(closed_walls) * ratio)
+        broken = 0
+        for cell, direction in closed_walls:
+            if broken >= target:
+                break
+            if self.try_break_wall_safely(cell, direction):
+                broken += 1
 
 def main() -> None:
     m = Maze(5, 5)
     m.generate_maze(m.grid[0][0])
+    m.add_loop()
     path = m.find_shortest_path(m.grid[0][0], m.grid[4][4])
     print(path)
 

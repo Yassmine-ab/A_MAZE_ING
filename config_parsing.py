@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
 
+from random import randint
+
+
 class MazeConfig:
     def __init__(self, width: int, height: int, entry: tuple[int, int],
-                 exit_pos: tuple[int, int], output_file: str, perfect: bool):
+                 exit_pos: tuple[int, int], output_file: str, perfect: bool, seed: int):
         self.width = width
         self.height = height
         self.entry = entry
         self.exit_pos = exit_pos
         self.output_file = output_file
         self.perfect = perfect
+        self.seed = seed
 
     @classmethod
     def from_config(cls, file_path: str) -> "MazeConfig":
@@ -31,6 +35,10 @@ class MazeConfig:
             exit_pos = (int(x), int(y))
             output_file = config["OUTPUT_FILE"]
             perfect = config.get("PERFECT", "False").lower() == "true"
+            if "SEED" in config:
+                seed = int(config["SEED"])
+            else:
+                seed = randint(0, 1000)
         except KeyError as e:
             raise ValueError(f"Missing required configuration key: {e}")
         except ValueError as e:
@@ -43,7 +51,7 @@ class MazeConfig:
             raise ValueError("Exit position must be within the maze dimensions.")
         if entry == exit_pos:
             raise ValueError("Entry and exit positions cannot be the same.")
-        return cls(width, height, entry, exit_pos, output_file, perfect)
+        return cls(width, height, entry, exit_pos, output_file, perfect, seed)
 
 def main() -> None:
     config_file_path = "config.txt"
@@ -56,6 +64,7 @@ def main() -> None:
         print(f"Exit: {maze_config.exit_pos}")
         print(f"Output File: {maze_config.output_file}")
         print(f"Perfect Maze: {maze_config.perfect}")
+        print(f"Seed: {maze_config.seed}")
     except Exception as e:
         print(f"Error loading configuration: {e}")
 
