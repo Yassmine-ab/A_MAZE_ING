@@ -167,7 +167,7 @@ class Maze:
         else:
             raise ValueError(f"Invalid direction: {direction}. Valid directions are 'North', 'East', 'South', 'West'.")
         filtered_areas = []
-        for cx, cy in affected_areas:    
+        for cx, cy in affected_areas:
             if cx >= 0 and cx + 2 < self.width and cy >= 0 and cy + 2 < self.height:
                 filtered_areas.append((cx, cy))
         return filtered_areas
@@ -196,7 +196,7 @@ class Maze:
 def main() -> None:
     m = Maze(5, 5)
     m.generate_maze(m.grid[0][0])
-    m.add_loop()
+    m.add_loops()
     path = m.find_shortest_path(m.grid[0][0], m.grid[4][4])
     print(path)
 
