@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from random import randint
+from secrets import randbits
 
 
 class MazeConfig:
@@ -38,7 +38,7 @@ class MazeConfig:
             if "SEED" in config:
                 seed = int(config["SEED"])
             else:
-                seed = randint(0, 1000)
+                seed = randbits(64)
         except KeyError as e:
             raise ValueError(f"Missing required configuration key: {e}")
         except ValueError as e:
