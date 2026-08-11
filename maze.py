@@ -88,15 +88,6 @@ class Maze:
             neighbor_cell.walls["East"] = True
             cell.walls[direction] = True
 
-    def try_break_wall_safely(self, cell: Cell, direction: str) -> bool:
-        x, y = cell.position
-        self.break_wall(cell, direction)
-        for cx, cy in self.get_affected_areas_3x3(x, y, direction):
-            if self.is_open_area_3x3(cx, cy):
-                self.restore_wall(cell, direction)
-                return False
-        return True
-
     def get_neighbors(self, cell: Cell) -> dict[str, Cell]:
         (x, y) = cell.position
         neighbors = {}
@@ -171,6 +162,15 @@ class Maze:
             if cx >= 0 and cx + 2 < self.width and cy >= 0 and cy + 2 < self.height:
                 filtered_areas.append((cx, cy))
         return filtered_areas
+
+    def try_break_wall_safely(self, cell: Cell, direction: str) -> bool:
+        x, y = cell.position
+        self.break_wall(cell, direction)
+        for cx, cy in self.get_affected_areas_3x3(x, y, direction):
+            if self.is_open_area_3x3(cx, cy):
+                self.restore_wall(cell, direction)
+                return False
+        return True
 
     def get_all_closed_walls(self) -> list[tuple[Cell, str]]:
         closed_walls = []
