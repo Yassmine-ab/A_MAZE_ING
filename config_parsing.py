@@ -5,8 +5,10 @@ from secrets import randbits
 
 
 class MazeConfig:
-    def __init__(self, width: int, height: int, entry: tuple[int, int],
-                 exit_pos: tuple[int, int], output_file: str, perfect: bool, seed: int):
+    def __init__(
+            self, width: int, height: int, entry: tuple[int, int],
+            exit_pos: tuple[int, int], output_file: str,
+            perfect: bool, seed: int):
         self.width = width
         self.height = height
         self.entry = entry
@@ -25,7 +27,8 @@ class MazeConfig:
                     key, value = line.split("=", 1)
                     config[key.strip()] = value.strip()
         if config == {}:
-            raise ValueError("Configuration file is empty or contains no valid entries.")
+            raise ValueError("Configuration file is empty or "
+                             "contains no valid entries.")
         try:
             width = int(config["WIDTH"])
             height = int(config["HEIGHT"])
@@ -46,12 +49,15 @@ class MazeConfig:
         if width <= 0 or height <= 0:
             raise ValueError("Width and height must be positive integers.")
         if not (0 <= entry[0] < width and 0 <= entry[1] < height):
-            raise ValueError("Entry position must be within the maze dimensions.")
+            raise ValueError("Entry position must be within "
+                             "the maze dimensions.")
         if not (0 <= exit_pos[0] < width and 0 <= exit_pos[1] < height):
-            raise ValueError("Exit position must be within the maze dimensions.")
+            raise ValueError("Exit position must be within "
+                             "the maze dimensions.")
         if entry == exit_pos:
             raise ValueError("Entry and exit positions cannot be the same.")
         return cls(width, height, entry, exit_pos, output_file, perfect, seed)
+
 
 def main() -> None:
     config_file_path = "config.txt"
@@ -67,6 +73,7 @@ def main() -> None:
         print(f"Seed: {maze_config.seed}")
     except Exception as e:
         print(f"Error loading configuration: {e}")
+
 
 if __name__ == "__main__":
     main()

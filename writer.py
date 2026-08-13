@@ -42,11 +42,12 @@ def get_binary(cell: Cell) -> int:
 def write_output(
     maze: Maze,
     entry: tuple[int, int],
-    exit_pos: tuple[int, int],
+    exit: tuple[int, int],
     path: list[str],
     output_file: str,
 ) -> None:
-    """Write the maze in hexadecimal, entry, exit, and shortest path to an output file.
+    """Write the maze in hexadecimal, entry, exit,
+        and shortest path to an output file.
 
     Parameters
     ----------
@@ -85,12 +86,13 @@ def write_output(
         with open(output_file, "w") as fd:
             fd.write(hexa_lines)
             fd.write(f"{entry[0]},{entry[1]}\n")
-            fd.write(f"{exit_pos[0]},{exit_pos[1]}\n")
+            fd.write(f"{exit[0]},{exit[1]}\n")
             fd.write(path_line)
     except OSError as msg:
         print(f"[STDERR] Error opening file '{output_file}': {msg}\n")
 
 
 # if __name__ == "__main__":
-#     cell = Cell((0, 0), {"North": False, "East": True, "South": False, "West": False})
+#     cell = Cell((0, 0), {"North": False,
+#                          "East": True, "South": False, "West": False})
 #     print(tuple([0, 1]))
