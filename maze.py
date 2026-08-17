@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+# update : il faut faire en sorte que les coord x = 0 est tjs le West en True
+# update : pareil pour le x = max il faut que le East soit tjs True
 
 from typing import Optional
 from random import shuffle
