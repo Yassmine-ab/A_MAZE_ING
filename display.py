@@ -1,63 +1,21 @@
 from maze import Maze
 
-
-# def ascii_maze(
-#     maze: Maze,
-#     entry: tuple[int, int],
-#     exit_pos: tuple[int, int],
-#     path: list[str] | None = None,
-# ) -> str:
-#     maze_display = str()
-#     WALL_H = "\033[47m   \033[0m"
-#     WALL_V = "\033[47m \033[0m"
-#     for row in maze.grid:
-#         first_line = str()
-#         second_line = str()
-#         for case in row:
-#             if case.walls["North"]:
-#                 first_line += WALL_H
-#             else:
-#                 first_line += "   "
-
-#             if case.walls["West"]:
-#                 second_line += WALL_V + "  "
-#             else:
-#                 second_line += "   "
-#         first_line += WALL_V
-#         second_line += WALL_V
-#         maze_display += "\n".join([
-#             first_line,
-#             second_line,
-#         ])
-#         maze_display += "\n"
-#     last_line = str()
-#     for case in maze.grid[-1]:
-#         if case.walls["South"]:
-#             last_line += WALL_H
-#         else:
-#             last_line += "   "
-#     last_line += WALL_V
-#     maze_display += last_line
-#     return maze_display
-
-
-#     ENTRY_WALL_H = "\033[45m    \033[0m"
-#     ENTRY_WALL_V = "\033[45m \033[0m"
-#     EXIT_WALL_H = "\033[41m    \033[0m"
-#     EXIT_WALL_V = "\033[41m \033[0m"
-
 def ascii_maze(
     maze: Maze,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
+    pattern_list : list[tuple] = [],
     path: list[str] | None = None,
 ) -> str:
     maze_display = str()
 
-    WALL_H = "\033[47m   \033[0m"  # 3 espaces
-    WALL_V = "\033[47m \033[0m"   # 1 espace
-    SPACE_H = "   "               # 3 espaces
-    SPACE_V = " "                 # 1 espace
+    WALL_H = "\033[47m   \033[0m"
+    WALL_V = "\033[47m \033[0m"
+    ENTRY_H = "\033[45m   \033[0m"
+    EXIT_H = "\033[41m   \033[0m"
+    GRAY = "\033[100m   \033[0m"
+    SPACE_H = "   "
+    SPACE_V = " "
 
     for row in maze.grid:
         first_line = str()
@@ -76,7 +34,15 @@ def ascii_maze(
                 second_line += WALL_V
             else:
                 second_line += SPACE_V
-            second_line += SPACE_H
+            if case.position == entry:
+                second_line += ENTRY_H
+            elif case.position == exit_pos:
+                second_line += EXIT_H
+            else:
+                if case.position in pattern_list:
+                    second_line += GRAY
+                else:
+                    second_line += SPACE_H
 
         # Fermeture de la ligne à droite (Dernier pilier et Dernier mur Est)
         first_line += WALL_V
