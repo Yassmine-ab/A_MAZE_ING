@@ -6,6 +6,7 @@ from collections import deque
 
 
 class Cell:
+    """Represents a single cell in the maze."""
     def __init__(
         self,
         position: tuple[int, int],
@@ -25,6 +26,7 @@ class Cell:
 
 
 class Maze:
+    """Represents the maze as a grid of cells."""
     def __init__(
         self, width: int, height: int, grid: Optional[list[list[Cell]]] = None
     ):
@@ -41,6 +43,7 @@ class Maze:
                 self.grid.append(row)
 
     def break_wall(self, cell: Cell, direction: str) -> None:
+        """Breaks the wall in the specified direction for the given cell."""
         if direction not in cell.walls:
             raise ValueError(
                 f"Invalid direction: {direction}. "
@@ -73,6 +76,7 @@ class Maze:
             cell.walls[direction] = False
 
     def restore_wall(self, cell: Cell, direction: str) -> None:
+        """Restores the wall in the specified direction for the given cell."""
         if direction not in cell.walls:
             raise ValueError(
                 f"Invalid direction: {direction}. "
@@ -105,6 +109,7 @@ class Maze:
             cell.walls[direction] = True
 
     def get_neighbors(self, cell: Cell) -> dict[str, Cell]:
+        """Returns a dictionary of neighboring cells with their corresponding directions."""
         x, y = cell.position
         neighbors = {}
         if y - 1 >= 0:
@@ -118,6 +123,7 @@ class Maze:
         return neighbors
 
     def generate_maze(self, current_cell: Cell) -> None:
+        """Generates the maze using a recursive backtracking algorithm."""
         current_cell.visited = True
         neighbors_list = list(self.get_neighbors(current_cell).items())
         shuffle(neighbors_list)
@@ -127,6 +133,7 @@ class Maze:
                 self.generate_maze(neighbor)
 
     def get_open_neighbors(self, cell: Cell) -> dict[str, Cell]:
+        """Returns a dictionary of open neighboring cells (no wall in between) with their corresponding directions."""
         neighbors = self.get_neighbors(cell)
         open_neighbors = {}
         for direction, neighbor in neighbors.items():
@@ -135,6 +142,8 @@ class Maze:
         return open_neighbors
 
     def find_shortest_path(self, start: Cell, end: Cell) -> list[str]:
+        """Finds the shortest path from start to end using Breadth-First Search (BFS) algorithm.
+        Returns a list of directions to reach the end cell from the start cell."""
         queue: deque[tuple[Cell, list[str]]] = deque([(start, [])])
         visited = set()
         visited.add(start.position)
@@ -151,6 +160,7 @@ class Maze:
         return []
 
     def is_open_area_3x3(self, x: int, y: int) -> bool:
+        """Checks if the 3x3 area starting at (x, y) is open (no walls)."""
         for dy in range(3):
             for dx in range(2):
                 neighbor_cell = self.grid[y + dy][x + dx]
@@ -166,6 +176,8 @@ class Maze:
     def get_affected_areas_3x3(
         self, x: int, y: int, direction: str
     ) -> list[tuple[int, int]]:
+        """Returns the list of the cells that would be impacted
+        if a wall is broken in the specified direction."""
         if direction == "East":
             affected_areas = [
                 (x - 1, y),
@@ -219,6 +231,9 @@ class Maze:
         return filtered_areas
 
     def try_break_wall_safely(self, cell: Cell, direction: str) -> bool:
+        """Attempts to break a wall in the specified direction for the given cell.
+        Returns True if the wall was broken successfully without creating a 3x3 open area,
+        otherwise restores the wall and returns False."""
         x, y = cell.position
         self.break_wall(cell, direction)
         for cx, cy in self.get_affected_areas_3x3(x, y, direction):
@@ -228,6 +243,7 @@ class Maze:
         return True
 
     def get_all_closed_walls(self) -> list[tuple[Cell, str]]:
+        """Returns a list of all closed walls in the maze as tuples of (cell, direction)."""
         closed_walls = []
         for y in range(self.height):
             for x in range(self.width):
@@ -244,6 +260,8 @@ class Maze:
         return closed_walls
 
     def add_loops(self, ratio: float = 0.15) -> None:
+        """Adds loops to the maze by breaking a certain ratio of closed walls.
+        The ratio parameter determines the fraction of closed walls to break."""
         closed_walls = self.get_all_closed_walls()
         shuffle(closed_walls)
         target = int(len(closed_walls) * ratio)
@@ -253,15 +271,3 @@ class Maze:
                 break
             if self.try_break_wall_safely(cell, direction):
                 broken += 1
-
-
-def main() -> None:
-    m = Maze(5, 5)
-    m.generate_maze(m.grid[0][0])
-    m.add_loops()
-    path = m.find_shortest_path(m.grid[0][0], m.grid[4][4])
-    print(path)
-
-
-if __name__ == "__main__":
-    main()

@@ -5,6 +5,7 @@ from secrets import randbits
 
 
 class MazeConfig:
+    """A class to hold the configuration for maze generation."""
     def __init__(
             self, width: int, height: int, entry: tuple[int, int],
             exit_pos: tuple[int, int], output_file: str,
@@ -19,6 +20,8 @@ class MazeConfig:
 
     @classmethod
     def from_config(cls, file_path: str) -> "MazeConfig":
+        """Reads the configuration from a file
+        and returns a MazeConfig instance."""
         config: dict[str, str] = {}
         with open(file_path, "r") as file:
             for line in file:
@@ -57,23 +60,3 @@ class MazeConfig:
         if entry == exit_pos:
             raise ValueError("Entry and exit positions cannot be the same.")
         return cls(width, height, entry, exit_pos, output_file, perfect, seed)
-
-
-def main() -> None:
-    config_file_path = "config.txt"
-    try:
-        maze_config = MazeConfig.from_config(config_file_path)
-        print("Maze configuration loaded successfully:")
-        print(f"Width: {maze_config.width}")
-        print(f"Height: {maze_config.height}")
-        print(f"Entry: {maze_config.entry}")
-        print(f"Exit: {maze_config.exit_pos}")
-        print(f"Output File: {maze_config.output_file}")
-        print(f"Perfect Maze: {maze_config.perfect}")
-        print(f"Seed: {maze_config.seed}")
-    except Exception as e:
-        print(f"Error loading configuration: {e}")
-
-
-if __name__ == "__main__":
-    main()

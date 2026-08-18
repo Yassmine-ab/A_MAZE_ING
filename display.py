@@ -65,7 +65,6 @@ def ascii_maze(
     maze_display += last_line
     return maze_display
 
-
 def trace_path(start: Cell, directions: list[str]) -> list[tuple[int, int]]:
     x, y = start.position
     cells: list[tuple[int, int]] = [(x, y)]
@@ -134,18 +133,3 @@ def user_interaction(
             continue
         else:
             return
-
-
-if __name__ == "__main__":
-    random.seed(5)
-
-    m = Maze(20, 15)
-
-    entry = (0, 0)
-    exit_pos = (19, 14)
-
-    result = apply_42_pattern(m, entry, exit_pos)
-    m.generate_maze(m.grid[0][0])
-    user_interaction(m, entry, exit_pos)
-
-

@@ -27,7 +27,7 @@ debug:
 
 clean:
 				$(call ANIMATION,Removing compiled files and caches)
-				@rm -f __pycache__ .mypy_cache *.pyc
+				@rm -rf __pycache__ .mypy_cache *.pyc
 				@printf "$(GREEN)✓$(DEFAULT) Cleaned\n"
 
 lint:

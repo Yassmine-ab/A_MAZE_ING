@@ -90,9 +90,3 @@ def write_output(
             fd.write(path_line)
     except OSError as msg:
         print(f"[STDERR] Error opening file '{output_file}': {msg}\n")
-
-
-# if __name__ == "__main__":
-#     cell = Cell((0, 0), {"North": False,
-#                          "East": True, "South": False, "West": False})
-#     print(tuple([0, 1]))
