@@ -1,5 +1,7 @@
 import random
-from maze import Cell, Maze
+from typing import Any
+from maze import Maze
+from config_parsing import MazeConfig
 from pattern42 import apply_42_pattern
 from pattern42 import pattern_list
 
@@ -8,13 +10,15 @@ def ascii_maze(
     maze: Maze,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
-    pattern_list: list[tuple[int, int]] = [],
-    params: dict[str, str] = {"WALL_H":"\033[47m   \033[0m",
+    pattern: list[tuple[int, int]],
+    path: list[tuple[int, int]],
+    params: dict[str, Any] = {"WALL_H":"\033[47m   \033[0m",
                               "WALL_V":"\033[47m \033[0m",
                               "ENTRY_H":"\033[45m   \033[0m",
                               "EXIT_H":"\033[41m   \033[0m",
-                              "FORTY_2":"\033[100m   \033[0m"},
-    path: list[tuple[int, int]] = []
+                              "FORTY_2":"\033[100m   \033[0m",
+                              "PATH_H":"   ",
+                              "ROTATE":False},
 ) -> str:
     maze_display = str()
     SPACE_H = "   "
@@ -40,8 +44,10 @@ def ascii_maze(
             elif case.position == exit_pos:
                 second_line += params["EXIT_H"]
             else:
-                if case.position in pattern_list:
+                if case.position in pattern:
                     second_line += params["FORTY_2"]
+                elif case.position in path:
+                    second_line += params["PATH_H"]
                 else:
                     second_line += SPACE_H
 
@@ -65,35 +71,22 @@ def ascii_maze(
     maze_display += last_line
     return maze_display
 
-def trace_path(start: Cell, directions: list[str]) -> list[tuple[int, int]]:
-    x, y = start.position
-    cells: list[tuple[int, int]] = [(x, y)]
-    for direction in directions:
-        if direction == "North":
-            y -= 1
-        elif direction == "East":
-            x += 1
-        elif direction == "South":
-            y += 1
-        elif direction == "West":
-            x -= 1
-        cells.append((x, y))
-    return cells
-
 
 def user_interaction(
     maze: Maze,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
-    pattern: list[tuple[int, int]] = [],
-    params: dict[str, str] = {"WALL_H":"\033[47m   \033[0m",
+    pattern: list[tuple[int, int]],
+    path: list[tuple[int, int]],
+    params: dict[str, Any] = {"WALL_H":"\033[47m   \033[0m",
                               "WALL_V":"\033[47m \033[0m",
                               "ENTRY_H":"\033[45m   \033[0m",
                               "EXIT_H":"\033[41m   \033[0m",
-                              "FORTY_2":"\033[100m   \033[0m"},
-    path: list[tuple[int, int]] = []
+                              "FORTY_2":"\033[100m   \033[0m",
+                              "PATH_H":"   ",
+                              "ROTATE":False},
 )-> None:
-    print(ascii_maze(maze, entry, exit_pos, params))
+    print(ascii_maze(maze, entry, exit_pos, pattern, path))
     while True:
         print("\n=== A-Maze-ing ====")
         print("1. Re-generate a new maze")
@@ -107,29 +100,47 @@ def user_interaction(
         except ValueError:
             print("\n[ERROR] You must enter an int between 1 and 4")
             continue
+
         if user == 1:
-            random.seed(4)
-            maze = Maze(20, 15)
-            entry = (0, 0)
-            exit_pos = (19, 14)
+            config_file_path = "config.txt"
+            maze_config = MazeConfig.from_config(config_file_path)
+            random.seed(maze_config.seed)
             result = apply_42_pattern(maze, entry, exit_pos)
             maze.generate_maze(maze.grid[0][0])
+            new_pattern = []
             if result:
-                coord_pat = pattern_list(maze)
-            print(ascii_maze(maze, entry, exit_pos, coord_pat))
+                new_pattern = pattern_list(maze)
+            print()
+            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
             continue
 
         elif user == 2:
-            pass # a faire
+            if params["PATH_H"] == "   ":
+                params["PATH_H"] = "\033[44m   \033[0m"
+            else:
+                params["PATH_H"] = "   "
+            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
+            continue
 
         elif user == 3:
-            params = {"WALL_H":"\033[44m   \033[0m",
+            if params["ROTATE"] is False:
+                params = {"WALL_H":"\033[44m   \033[0m",
                       "WALL_V":"\033[44m \033[0m",
                       "ENTRY_H":"\033[47m   \033[0m",
                       "EXIT_H":"\033[42m   \033[0m",
-                      "FORTY_2":"\033[43m   \033[0m"}
-            coord_pat = pattern_list(maze)
-            print(ascii_maze(maze, entry, exit_pos, coord_pat, params))
+                      "FORTY_2":"\033[43m   \033[0m",
+                      "PATH_H":"   ",
+                      "ROTATE":True}
+            else:
+                params = {"WALL_H":"\033[47m   \033[0m",
+                          "WALL_V":"\033[47m \033[0m",
+                          "ENTRY_H":"\033[45m   \033[0m",
+                          "EXIT_H":"\033[41m   \033[0m",
+                          "FORTY_2":"\033[100m   \033[0m",
+                          "PATH_H":"\033[44m   \033[0m",
+                          "ROTATE":False}
+            print(ascii_maze(maze, entry, exit_pos, pattern, path, params))
             continue
+
         else:
             return
