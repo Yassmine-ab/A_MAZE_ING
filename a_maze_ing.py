@@ -3,3 +3,6 @@
 # avant la génération du labyrinthe pour
 # initialiser le générateur de nombres aléatoires
 # avec la seed qui a été fournie
+
+
+if 

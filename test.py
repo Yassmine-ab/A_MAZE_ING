@@ -19,13 +19,13 @@ def main() -> None:
     entry = (0, 0)
     exit_pos = (19, 14)
 
-    #result = apply_42_pattern(m, entry, exit_pos)
+    result = apply_42_pattern(m, entry, exit_pos)
     m.generate_maze(m.grid[0][0])
 
-    # if result:
-    #     coord_pat = pattern_list(m)
+    if result:
+        coord_pat = pattern_list(m)
 
-    print(ascii_maze(m, entry, exit_pos))
+    print(ascii_maze(m, entry, exit_pos, coord_pat))
 
 
 if __name__ == "__main__":

@@ -1,19 +1,22 @@
+import random
 from maze import Maze
+from pattern42 import apply_42_pattern
+from pattern42 import pattern_list
+
 
 def ascii_maze(
     maze: Maze,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
-    pattern_list: list[tuple] = [],
-    path: list[str] | None = None,
+    pattern_list: list[tuple[int, int]] = [],
+    params: dict[str, str] = {"WALL_H":"\033[47m   \033[0m",
+                              "WALL_V":"\033[47m \033[0m",
+                              "ENTRY_H":"\033[45m   \033[0m",
+                              "EXIT_H":"\033[41m   \033[0m",
+                              "FORTY_2":"\033[100m   \033[0m"},
+    path: list[tuple[int, int]] = []
 ) -> str:
     maze_display = str()
-
-    WALL_H = "\033[47m   \033[0m"
-    WALL_V = "\033[47m \033[0m"
-    ENTRY_H = "\033[45m   \033[0m"
-    EXIT_H = "\033[41m   \033[0m"
-    GRAY = "\033[100m   \033[0m"
     SPACE_H = "   "
     SPACE_V = " "
 
@@ -22,29 +25,29 @@ def ascii_maze(
         second_line = str()
 
         for case in row:
-            first_line += WALL_V
+            first_line += params["WALL_V"]
             if case.walls["North"]:
-                first_line += WALL_H
+                first_line += params["WALL_H"]
             else:
                 first_line += SPACE_H
 
             if case.walls["West"]:
-                second_line += WALL_V
+                second_line += params["WALL_V"]
             else:
                 second_line += SPACE_V
             if case.position == entry:
-                second_line += ENTRY_H
+                second_line += params["ENTRY_H"]
             elif case.position == exit_pos:
-                second_line += EXIT_H
+                second_line += params["EXIT_H"]
             else:
                 if case.position in pattern_list:
-                    second_line += GRAY
+                    second_line += params["FORTY_2"]
                 else:
                     second_line += SPACE_H
 
-        first_line += WALL_V
+        first_line += params["WALL_V"]
         if row[-1].walls["East"]:
-            second_line += WALL_V
+            second_line += params["WALL_V"]
         else:
             second_line += SPACE_V
 
@@ -52,12 +55,81 @@ def ascii_maze(
 
     last_line = str()
     for case in maze.grid[-1]:
-        last_line += WALL_V
+        last_line += params["WALL_V"]
         if case.walls["South"]:
-            last_line += WALL_H
+            last_line += params["WALL_H"]
         else:
             last_line += SPACE_H
-    last_line += WALL_V
+    last_line += params["WALL_V"]
 
     maze_display += last_line
     return maze_display
+
+
+def user_interaction(
+    maze: Maze,
+    entry: tuple[int, int],
+    exit_pos: tuple[int, int],
+    pattern: list[tuple[int, int]] = [],
+    params: dict[str, str] = {"WALL_H":"\033[47m   \033[0m",
+                              "WALL_V":"\033[47m \033[0m",
+                              "ENTRY_H":"\033[45m   \033[0m",
+                              "EXIT_H":"\033[41m   \033[0m",
+                              "FORTY_2":"\033[100m   \033[0m"},
+    path: list[tuple[int, int]] = []
+)-> None:
+    print(ascii_maze(maze, entry, exit_pos, params))
+    while True:
+        print("\n=== A-Maze-ing ====")
+        print("1. Re-generate a new maze")
+        print("2. Show/Hide path from entry to exit")
+        print("3. Rotate maze colors")
+        print("4. Quit")
+        try:
+            user = int(input("Choice? (1-4):  "))
+            if user < 1 or user > 4:
+                raise ValueError()
+        except ValueError:
+            print("\n[ERROR] You must enter an int between 1 and 4")
+            continue
+        if user == 1:
+            random.seed(4)
+            maze = Maze(20, 15)
+            entry = (0, 0)
+            exit_pos = (19, 14)
+            result = apply_42_pattern(maze, entry, exit_pos)
+            maze.generate_maze(maze.grid[0][0])
+            if result:
+                coord_pat = pattern_list(maze)
+            print(ascii_maze(maze, entry, exit_pos, coord_pat))
+            continue
+
+        elif user == 2:
+            pass # a faire
+
+        elif user == 3:
+            params = {"WALL_H":"\033[44m   \033[0m",
+                      "WALL_V":"\033[44m \033[0m",
+                      "ENTRY_H":"\033[47m   \033[0m",
+                      "EXIT_H":"\033[42m   \033[0m",
+                      "FORTY_2":"\033[43m   \033[0m"}
+            coord_pat = pattern_list(maze)
+            print(ascii_maze(maze, entry, exit_pos, coord_pat, params))
+            continue
+        else:
+            return
+
+
+if __name__ == "__main__":
+    random.seed(5)
+
+    m = Maze(20, 15)
+
+    entry = (0, 0)
+    exit_pos = (19, 14)
+
+    result = apply_42_pattern(m, entry, exit_pos)
+    m.generate_maze(m.grid[0][0])
+    user_interaction(m, entry, exit_pos)
+
+
