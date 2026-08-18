@@ -1,5 +1,5 @@
 import random
-from maze import Maze
+from maze import Cell, Maze
 from pattern42 import apply_42_pattern
 from pattern42 import pattern_list
 
@@ -64,6 +64,22 @@ def ascii_maze(
 
     maze_display += last_line
     return maze_display
+
+
+def trace_path(start: Cell, directions: list[str]) -> list[tuple[int, int]]:
+    x, y = start.position
+    cells: list[tuple[int, int]] = [(x, y)]
+    for direction in directions:
+        if direction == "North":
+            y -= 1
+        elif direction == "East":
+            x += 1
+        elif direction == "South":
+            y += 1
+        elif direction == "West":
+            x -= 1
+        cells.append((x, y))
+    return cells
 
 
 def user_interaction(
