@@ -17,7 +17,7 @@ endef
 
 install:
 				$(call ANIMATION,Installing activity dependencies)
-				@pip install
+				@python3 -m pip install -r requirements.txt
 
 run:
 				@python3 a_maze_ing.py config.txt
@@ -31,7 +31,7 @@ clean:
 				@printf "$(GREEN)✓$(DEFAULT) Cleaned\n"
 
 lint:
-				@flake8 . && mypy . --warn-return-any--warn-unused-ignores--ignore-missing-imports--disallow-untyped-defs--check-untyped-defs main.py
+				@flake8 . && mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
 				@flake8 . && mypy . --strict
