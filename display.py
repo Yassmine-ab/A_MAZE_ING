@@ -1,6 +1,7 @@
 import random
 from typing import Any
-from maze import Maze
+from maze import Maze, Cell
+from writer import write_output
 from config_parsing import MazeConfig
 from pattern42 import apply_42_pattern
 from pattern42 import pattern_list
@@ -18,6 +19,7 @@ def ascii_maze(
                               "EXIT_H":"\033[41m   \033[0m",
                               "FORTY_2":"\033[100m   \033[0m",
                               "PATH_H":"   ",
+                              "PATH_V":" ",
                               "ROTATE":False},
 ) -> str:
     maze_display = str()
@@ -33,12 +35,18 @@ def ascii_maze(
             if case.walls["North"]:
                 first_line += params["WALL_H"]
             else:
-                first_line += SPACE_H
+                if case.position in path:
+                    first_line += params["PATH_H"]
+                else:
+                    first_line += SPACE_H
 
             if case.walls["West"]:
                 second_line += params["WALL_V"]
             else:
-                second_line += SPACE_V
+                if case.position in path:
+                    second_line += params["PATH_V"]
+                else:
+                    second_line += SPACE_V
             if case.position == entry:
                 second_line += params["ENTRY_H"]
             elif case.position == exit_pos:
@@ -84,9 +92,14 @@ def user_interaction(
                               "EXIT_H":"\033[41m   \033[0m",
                               "FORTY_2":"\033[100m   \033[0m",
                               "PATH_H":"   ",
+                              "PATH_V":" ",
                               "ROTATE":False},
 )-> None:
     print(ascii_maze(maze, entry, exit_pos, pattern, path))
+    start = maze.grid[entry[1]][entry[0]]
+    end = maze.grid[exit_pos[1]][exit_pos[0]]
+    path_list = maze.find_shortest_path(start, end)
+    write_output(maze, entry, exit_pos, path_list, "output_maze.txt")
     while True:
         print("\n=== A-Maze-ing ====")
         print("1. Re-generate a new maze")
@@ -112,33 +125,53 @@ def user_interaction(
                 new_pattern = pattern_list(maze)
             print()
             print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
+            start = maze.grid[entry[1]][entry[0]]
+            end = maze.grid[exit_pos[1]][exit_pos[0]]
+            path_list = maze.find_shortest_path(start, end)
+            write_output(maze, entry, exit_pos, path_list, "output_maze.txt")
             continue
 
         elif user == 2:
+            result = apply_42_pattern(maze, entry, exit_pos)
+            maze.generate_maze(maze.grid[0][0])
+            new_pattern = []
+            if result:
+                new_pattern = pattern_list(maze)
             if params["PATH_H"] == "   ":
-                params["PATH_H"] = "\033[44m   \033[0m"
+                if params["ROTATE"]:
+                    params["PATH_H"] = "\033[41m   \033[0m"
+                    params["PATH_V"] = "\033[41m \033[0m"
+                else:
+                    params["PATH_H"] = "\033[44m   \033[0m"
+                    params["PATH_V"] = "\033[44m \033[0m"
             else:
                 params["PATH_H"] = "   "
-            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
+                params["PATH_V"] = " "
+            print(ascii_maze(maze, entry, exit_pos, new_pattern, path, params))
             continue
 
         elif user == 3:
             if params["ROTATE"] is False:
-                params = {"WALL_H":"\033[44m   \033[0m",
-                      "WALL_V":"\033[44m \033[0m",
-                      "ENTRY_H":"\033[47m   \033[0m",
-                      "EXIT_H":"\033[42m   \033[0m",
-                      "FORTY_2":"\033[43m   \033[0m",
-                      "PATH_H":"   ",
-                      "ROTATE":True}
+                params["WALL_H"] = "\033[44m   \033[0m"
+                params["WALL_V"] = "\033[44m \033[0m"
+                params["ENTRY_H"] = "\033[47m   \033[0m"
+                params["EXIT_H"] = "\033[42m   \033[0m"
+                params["FORTY_2"] = "\033[43m   \033[0m"
+                params["ROTATE"] = True
+                if params["PATH_H"] != "   ":
+                    params["PATH_H"] = "\033[41m   \033[0m"
+                    params["PATH_V"] = "\033[41m \033[0m"
+
             else:
-                params = {"WALL_H":"\033[47m   \033[0m",
-                          "WALL_V":"\033[47m \033[0m",
-                          "ENTRY_H":"\033[45m   \033[0m",
-                          "EXIT_H":"\033[41m   \033[0m",
-                          "FORTY_2":"\033[100m   \033[0m",
-                          "PATH_H":"\033[44m   \033[0m",
-                          "ROTATE":False}
+                params["WALL_H"] = "\033[47m   \033[0m"
+                params["WALL_V"] = "\033[47m \033[0m"
+                params["ENTRY_H"] = "\033[45m   \033[0m"
+                params["EXIT_H"] = "\033[41m   \033[0m"
+                params["FORTY_2"] = "\033[100m   \033[0m"
+                params["ROTATE"] = False
+                if params["PATH_H"] != "   ":
+                    params["PATH_H"] = "\033[44m   \033[0m"
+                    params["PATH_V"] = "\033[44m \033[0m"
             print(ascii_maze(maze, entry, exit_pos, pattern, path, params))
             continue
 

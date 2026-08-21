@@ -40,7 +40,9 @@ def main() -> None:
     maze.generate_maze(maze.grid[0][0])
     if not maze_config.perfect:
         maze.add_loops()
-    path = trace_path(Cell(entry), maze.find_shortest_path(Cell(entry), Cell(exit_pos)))
+    start = maze.grid[entry[1]][entry[0]]
+    end = maze.grid[exit_pos[1]][exit_pos[0]]
+    path = trace_path(start, maze.find_shortest_path(start, end))
     user_interaction(maze, entry, exit_pos, pattern, path)
 
 
