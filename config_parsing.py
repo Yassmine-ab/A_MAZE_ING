@@ -49,14 +49,4 @@ class MazeConfig:
             raise ValueError(f"Missing required configuration key: {e}")
         except ValueError as e:
             raise ValueError(f"Invalid value in configuration: {e}")
-        if width <= 0 or height <= 0:
-            raise ValueError("Width and height must be positive integers.")
-        if not (0 <= entry[0] < width and 0 <= entry[1] < height):
-            raise ValueError("Entry position must be within "
-                             "the maze dimensions.")
-        if not (0 <= exit_pos[0] < width and 0 <= exit_pos[1] < height):
-            raise ValueError("Exit position must be within "
-                             "the maze dimensions.")
-        if entry == exit_pos:
-            raise ValueError("Entry and exit positions cannot be the same.")
         return cls(width, height, entry, exit_pos, output_file, perfect, seed)

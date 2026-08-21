@@ -1,7 +1,7 @@
-from maze import Maze
+from mazegen import MazeGenerator
 
 
-def pattern_list(maze: Maze) -> list[tuple]:
+def pattern_list(maze: MazeGenerator) -> list[tuple[int, int]]:
     y_start = (maze.height - 5) // 2
     x_start = (maze.width - 7) // 2
     quarante_deux_shape = [
@@ -32,7 +32,7 @@ def pattern_list(maze: Maze) -> list[tuple]:
 
 
 def apply_42_pattern(
-    maze: Maze,
+    maze: MazeGenerator,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
 ) -> bool:
