@@ -157,7 +157,9 @@ def user_interaction(
             path_list = maze.find_shortest_path(start, end)
             path = maze.trace_path(start, path_list)
             print()
-            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
+            print(ascii_maze(
+                maze, entry, exit_pos, new_pattern, path, params
+            ))
             maze.write_output(maze, entry, exit_pos, path_list, output)
             pattern = new_pattern
             continue
