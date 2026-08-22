@@ -120,7 +120,7 @@ class MazeGenerator:
                 self.grid[y][x].visited = True
         self.generate_perfect_maze(self.grid[0][0])
         if not self.perfect:
-            self.add_loops(self.loop_ratio)
+            self.add_loops(self.loop_ratio, protected_positions)
         self.solution_directions = self.find_shortest_path(
             self.grid[self.entry[1]][self.entry[0]],
             self.grid[self.exit_pos[1]][self.exit_pos[0]],
@@ -198,7 +198,11 @@ class MazeGenerator:
             neighbor_cell.walls["East"] = False
             cell.walls[direction] = False
 
-    def add_loops(self, ratio: float = 0.15) -> None:
+    def add_loops(
+        self,
+        ratio: float = 0.15,
+        protected_positions: set[tuple[int, int]] | None = None,
+    ) -> None:
         """Add loops by breaking a ratio of closed walls safely."""
         closed_walls = self.get_all_closed_walls()
         self.rng.shuffle(closed_walls)
@@ -207,6 +211,15 @@ class MazeGenerator:
         for cell, direction in closed_walls:
             if broken >= target:
                 break
+            x, y = cell.position
+            neighbor_position = (
+                (x + 1, y) if direction == "East" else (x, y + 1)
+            )
+            if protected_positions and (
+                cell.position in protected_positions
+                or neighbor_position in protected_positions
+            ):
+                continue
             if self.try_break_wall_safely(cell, direction):
                 broken += 1
 

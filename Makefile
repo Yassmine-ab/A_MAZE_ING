@@ -17,7 +17,7 @@ endef
 
 install:
 				$(call ANIMATION,Installing activity dependencies)
-				@python3 -m pip install build
+				@python3 -m pip install -e . && python3 -m pip install build && python3 -m build
 
 run:
 				@python3 a_maze_ing.py config.txt

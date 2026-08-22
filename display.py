@@ -96,10 +96,10 @@ def build_maze(
     try:
         result = apply_42_pattern(maze, maze_config.entry,
                                   maze_config.exit_pos)
-        pattern: list[tuple[int, int]] = []
         if not result:
             raise ValueError("Change the file 'config.txt' "
                              "to allow the 42 pattern ")
+        pattern: list[tuple[int, int]] = []
         pattern = pattern_list(maze)
         maze.generate(set(pattern) if result else None)
         return maze, pattern
@@ -123,6 +123,7 @@ def user_interaction(
         "EXIT_H": "\033[41m   \033[0m",
         "FORTY_2": "\033[100m   \033[0m",
         "PATH_H": "   ",
+        "PATH_V": " ",
         "ROTATE": False,
     },
 ) -> None:
@@ -150,13 +151,15 @@ def user_interaction(
             result = build_maze(maze_config)
             if not result:
                 return
-            maze, pattern = result
-            print()
-            print(ascii_maze(maze, entry, exit_pos, pattern, path))
+            maze, new_pattern = result
             start = maze.grid[entry[1]][entry[0]]
             end = maze.grid[exit_pos[1]][exit_pos[0]]
             path_list = maze.find_shortest_path(start, end)
+            path = maze.trace_path(start, path_list)
+            print()
+            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
             maze.write_output(maze, entry, exit_pos, path_list, output)
+            pattern = new_pattern
             continue
 
         elif user == 2:
