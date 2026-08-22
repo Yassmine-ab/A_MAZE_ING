@@ -44,7 +44,7 @@ class MazeConfig:
             if "SEED" in config:
                 seed = int(config["SEED"])
             else:
-                seed = randbits(64)
+                seed = randbits(8)
         except KeyError as e:
             raise ValueError(f"Missing required configuration key: {e}")
         except ValueError as e:

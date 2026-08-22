@@ -1,4 +1,5 @@
 from typing import Any
+from secrets import randbits
 from mazegen import MazeGenerator
 from config_parsing import MazeConfig
 from pattern42 import apply_42_pattern
@@ -25,43 +26,43 @@ def ascii_maze(
     SPACE_V = " "
 
     for row in maze.grid:
-        first_line = ""
-        second_line = ""
+        first_line = str()
+        second_line = str()
 
         for case in row:
             x, y = case.position
 
             first_line += params["WALL_V"]
             if case.walls["North"]:
-                first_line += params["WALL_H"]
+                first_line += str(params["WALL_H"])
             else:
                 if case.position in path and y > 0 and (x, y - 1) in path:
-                    first_line += params["PATH_H"]
+                    first_line += str(params["PATH_H"])
                 else:
                     first_line += SPACE_H
 
             if case.walls["West"]:
-                second_line += params["WALL_V"]
+                second_line += str(params["WALL_V"])
             else:
                 if case.position in path and x > 0 and (x - 1, y) in path:
-                    second_line += params["PATH_V"]
+                    second_line += str(params["PATH_V"])
                 else:
                     second_line += SPACE_V
 
             if case.position == entry:
-                second_line += params["ENTRY_H"]
+                second_line += str(params["ENTRY_H"])
             elif case.position == exit_pos:
-                second_line += params["EXIT_H"]
+                second_line += str(params["EXIT_H"])
             elif case.position in pattern:
-                second_line += params["FORTY_2"]
+                second_line += str(params["FORTY_2"])
             elif case.position in path:
-                second_line += params["PATH_H"]
+                second_line += str(params["PATH_H"])
             else:
                 second_line += SPACE_H
 
         first_line += params["WALL_V"]
         if row[-1].walls["East"]:
-            second_line += params["WALL_V"]
+            second_line += str(params["WALL_V"])
         else:
             second_line += SPACE_V
 
@@ -69,12 +70,12 @@ def ascii_maze(
 
     last_line = ""
     for case in maze.grid[-1]:
-        last_line += params["WALL_V"]
+        last_line += str(params["WALL_V"])
         if case.walls["South"]:
-            last_line += params["WALL_H"]
+            last_line += str(params["WALL_H"])
         else:
             last_line += SPACE_H
-    last_line += params["WALL_V"]
+    last_line += str(params["WALL_V"])
 
     maze_display += last_line
     return maze_display
@@ -145,9 +146,13 @@ def user_interaction(
             continue
 
         if user == 1:
-            maze, new_pattern = build_maze(maze_config)
+            maze_config.seed = randbits(8)
+            result = build_maze(maze_config)
+            if not result:
+                return
+            maze, pattern = result
             print()
-            print(ascii_maze(maze, entry, exit_pos, new_pattern, path))
+            print(ascii_maze(maze, entry, exit_pos, pattern, path))
             start = maze.grid[entry[1]][entry[0]]
             end = maze.grid[exit_pos[1]][exit_pos[0]]
             path_list = maze.find_shortest_path(start, end)

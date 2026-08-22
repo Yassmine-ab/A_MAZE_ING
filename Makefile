@@ -17,7 +17,7 @@ endef
 
 install:
 				$(call ANIMATION,Installing activity dependencies)
-				@python3 -m pip install -r requirements.txt
+				@python3 -m pip install build
 
 run:
 				@python3 a_maze_ing.py config.txt
@@ -41,8 +41,7 @@ test:
 				@pytest tests
 
 venv:
-				python3 -m venv venv
-				source venv/bin/activate
+				@python3 -m venv venv && source venv/bin/activate
 
 help:
 				@printf "Usage: make [target]\n"
