@@ -24,7 +24,8 @@ def main() -> int:
         end_cell = maze.grid[exit_pos[1]][exit_pos[0]]
         directions = maze.find_shortest_path(start_cell, end_cell)
         path = maze.trace_path(start_cell, directions)
-        user_interaction(maze, maze_config, entry, exit_pos, pattern, path, output)
+        user_interaction(maze, maze_config, entry,
+                         exit_pos, pattern, path, output)
         return 0
     except (FileNotFoundError, ValueError, OSError) as error:
         print(f"[STDERR] {error}")

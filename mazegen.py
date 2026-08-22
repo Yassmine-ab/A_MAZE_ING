@@ -76,11 +76,13 @@ class MazeGenerator:
         if width <= 0 or height <= 0:
             raise ValueError("Width and height must be positive integers.")
         if not (0 <= entry[0] < width and 0 <= entry[1] < height):
-            raise ValueError("Entry position must be within the maze dimensions.")
+            raise ValueError("Entry position must be "
+                             "within the maze dimensions.")
         if exit_pos is None:
             exit_pos = (width - 1, height - 1)
         if not (0 <= exit_pos[0] < width and 0 <= exit_pos[1] < height):
-            raise ValueError("Exit position must be within the maze dimensions.")
+            raise ValueError("Exit position must be "
+                             "within the maze dimensions.")
         if entry == exit_pos:
             raise ValueError("Entry and exit positions cannot be the same.")
         if loop_ratio < 0 or loop_ratio > 1:
@@ -425,7 +427,6 @@ class MazeGenerator:
         else:
             bit = bit << 1
         return bit
-
 
     def write_output(
         self,

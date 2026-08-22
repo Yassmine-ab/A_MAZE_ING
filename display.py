@@ -11,14 +11,14 @@ def ascii_maze(
     exit_pos: tuple[int, int],
     pattern: list[tuple[int, int]],
     path: list[tuple[int, int]],
-    params: dict[str, Any] = {"WALL_H":"\033[47m   \033[0m",
-                              "WALL_V":"\033[47m \033[0m",
-                              "ENTRY_H":"\033[45m   \033[0m",
-                              "EXIT_H":"\033[41m   \033[0m",
-                              "FORTY_2":"\033[100m   \033[0m",
-                              "PATH_H":"   ",
-                              "PATH_V":" ",
-                              "ROTATE":False},
+    params: dict[str, Any] = {"WALL_H": "\033[47m   \033[0m",
+                              "WALL_V": "\033[47m \033[0m",
+                              "ENTRY_H": "\033[45m   \033[0m",
+                              "EXIT_H": "\033[41m   \033[0m",
+                              "FORTY_2": "\033[100m   \033[0m",
+                              "PATH_H": "   ",
+                              "PATH_V": " ",
+                              "ROTATE": False},
 ) -> str:
     maze_display = str()
     SPACE_H = "   "
@@ -93,10 +93,12 @@ def build_maze(
         perfect=maze_config.perfect,
     )
     try:
-        result = apply_42_pattern(maze, maze_config.entry, maze_config.exit_pos)
+        result = apply_42_pattern(maze, maze_config.entry,
+                                  maze_config.exit_pos)
         pattern: list[tuple[int, int]] = []
         if not result:
-            raise ValueError("Change the file 'config.txt' to allow the 42 pattern ")
+            raise ValueError("Change the file 'config.txt' "
+                             "to allow the 42 pattern ")
         pattern = pattern_list(maze)
         maze.generate(set(pattern) if result else None)
         return maze, pattern
